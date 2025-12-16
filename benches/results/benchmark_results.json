@@ -1,0 +1,77 @@
+{
+  "models": [
+    {
+      "is_valid": true,
+      "load_time_ms": 99.934617,
+      "name": "resnet18",
+      "node_reduction_percent": 28.985507246376812,
+      "optimize_time_ms": 168.87369999999999,
+      "optimized_nodes": 49,
+      "optimized_size_bytes": 46754609,
+      "original_nodes": 69,
+      "original_size_bytes": 46820737,
+      "save_time_ms": 50.042017,
+      "size_reduction_percent": 0.14123656361923564
+    },
+    {
+      "is_valid": true,
+      "load_time_ms": 838.555529,
+      "name": "roberta-base",
+      "node_reduction_percent": 6.186440677966102,
+      "optimize_time_ms": 1106.616953,
+      "optimized_nodes": 1107,
+      "optimized_size_bytes": 498660222,
+      "original_nodes": 1180,
+      "original_size_bytes": 498658080,
+      "save_time_ms": 431.337058,
+      "size_reduction_percent": 0.0
+    },
+    {
+      "is_valid": true,
+      "load_time_ms": 7.460883,
+      "name": "squeezenet1.1",
+      "node_reduction_percent": 1.5151515151515151,
+      "optimize_time_ms": 2.7158889999999998,
+      "optimized_nodes": 65,
+      "optimized_size_bytes": 4956011,
+      "original_nodes": 66,
+      "original_size_bytes": 4956208,
+      "save_time_ms": 5.591209,
+      "size_reduction_percent": 0.003974813002198456
+    },
+    {
+      "is_valid": true,
+      "load_time_ms": 1238.068948,
+      "name": "gpt2-lm-head",
+      "node_reduction_percent": 0.0,
+      "optimize_time_ms": 1514.6523809999999,
+      "optimized_nodes": 2534,
+      "optimized_size_bytes": 664870614,
+      "original_nodes": 2534,
+      "original_size_bytes": 664871060,
+      "save_time_ms": 577.324528,
+      "size_reduction_percent": 0.00006708067576290657
+    },
+    {
+      "is_valid": true,
+      "load_time_ms": 18.344972000000002,
+      "name": "mobilenetv2",
+      "node_reduction_percent": 34.193548387096776,
+      "optimize_time_ms": 20.449379,
+      "optimized_nodes": 102,
+      "optimized_size_bytes": 14008252,
+      "original_nodes": 155,
+      "original_size_bytes": 14246826,
+      "save_time_ms": 15.315334,
+      "size_reduction_percent": 1.6745764986531033
+    }
+  ],
+  "summary": {
+    "all_valid": true,
+    "total_optimized_nodes": 3857,
+    "total_original_nodes": 4004,
+    "total_reduction_percent": 3.6713286713286712,
+    "total_time_ms": 2813.308302
+  },
+  "timestamp": "2025-12-03T03:04:44.246206626+00:00"
+}

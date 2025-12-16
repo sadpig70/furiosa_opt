@@ -1,0 +1,41 @@
+[build-system]
+requires = ["maturin>=1.4,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "furiosa-optimizer"
+version = "0.1.0"
+description = "High-performance ONNX model optimizer for Furiosa NPU"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Jung Wook Yang", email = "sadpig70@gmail.com"}
+]
+keywords = ["onnx", "optimizer", "neural-network", "npu", "furiosa", "machine-learning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Rust",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Repository = "https://github.com/prtx/furiosa-optimizer-rs"
+Documentation = "https://github.com/prtx/furiosa-optimizer-rs#readme"
+
+[tool.maturin]
+features = ["python"]
+python-source = "python"
+module-name = "furiosa_optimizer"

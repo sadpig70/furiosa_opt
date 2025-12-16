@@ -1,0 +1,391 @@
+// ONNX Protocol Buffer Definition
+// Based on ONNX IR version 9, opset version 19
+// Simplified for furiosa-optimizer core functionality
+
+syntax = "proto3";
+
+package onnx;
+
+// Versioning
+//
+// ONNX versioning is specified in docs/Versioning.md
+
+// Attributes
+//
+// A named attribute containing either singular float, integer, string,
+// graph, and tensor values, or repeated float, integer, string, graph,
+// and tensor values.
+message AttributeProto {
+  // The name field MUST be present for this version of the IR.
+  string name = 1;
+
+  // if ref_attr_name is not empty, ref_attr_name is the attribute name
+  // in parent function. In this case, this AttributeProto does not contain
+  // data, and it's a reference of attribute in parent function.
+  string ref_attr_name = 21;
+
+  // A human-readable documentation for this attribute.
+  string doc_string = 13;
+
+  // The type field MUST be present for this version of the IR.
+  // For 0.0.1 versions of the IR, this field was not defined, and
+  // implementations needed to use has_field heuristics to determine
+  // which value field was in use.
+  AttributeType type = 20;
+
+  // Exactly ONE of the following fields must be present
+  float f = 2;                   // float
+  int64 i = 3;                   // int
+  bytes s = 4;                   // UTF-8 string
+  TensorProto t = 5;             // tensor
+  GraphProto g = 6;              // graph
+  SparseTensorProto sparse_tensor = 22;  // sparse tensor
+  TypeProto tp = 14;             // type proto
+
+  repeated float floats = 7;     // list of floats
+  repeated int64 ints = 8;       // list of ints
+  repeated bytes strings = 9;    // list of UTF-8 strings
+  repeated TensorProto tensors = 10;     // list of tensors
+  repeated GraphProto graphs = 11;       // list of graphs
+  repeated SparseTensorProto sparse_tensors = 23; // list of sparse tensors
+  repeated TypeProto type_protos = 15;   // list of type protos
+
+  // Attribute type enumeration
+  enum AttributeType {
+    UNDEFINED = 0;
+    FLOAT = 1;
+    INT = 2;
+    STRING = 3;
+    TENSOR = 4;
+    GRAPH = 5;
+    SPARSE_TENSOR = 11;
+    TYPE_PROTO = 13;
+
+    FLOATS = 6;
+    INTS = 7;
+    STRINGS = 8;
+    TENSORS = 9;
+    GRAPHS = 10;
+    SPARSE_TENSORS = 12;
+    TYPE_PROTOS = 14;
+  }
+}
+
+// Defines information on value, including the name, the type, and
+// the shape of the value.
+message ValueInfoProto {
+  // This field MUST be present in this version of the IR.
+  string name = 1;
+  // This field MUST be present in this version of the IR.
+  TypeProto type = 2;
+  // A human-readable documentation for this value.
+  string doc_string = 3;
+}
+
+// Nodes
+//
+// Computation graphs are made up of a DAG of nodes
+message NodeProto {
+  repeated string input = 1;     // namespace Value
+  repeated string output = 2;    // namespace Value
+  // An optional identifier for this node in a graph.
+  string name = 3;               // namespace Node
+  // The symbolic identifier of the Operator to execute.
+  string op_type = 4;            // namespace Operator
+  // The domain of the OperatorSet that specifies the operator named by op_type.
+  string domain = 7;             // namespace Domain
+  // Additional named attributes.
+  repeated AttributeProto attribute = 5;
+  // A human-readable documentation for this node.
+  string doc_string = 6;
+}
+
+// Training information
+// Contains information relevant to training
+message TrainingInfoProto {
+  GraphProto initialization = 1;
+  GraphProto algorithm = 2;
+  repeated StringStringEntryProto initialization_binding = 3;
+  repeated StringStringEntryProto update_binding = 4;
+}
+
+// Models
+//
+// ModelProto is a top-level file/container format for bundling a ML model.
+message ModelProto {
+  // The version of the IR this model targets.
+  int64 ir_version = 1;
+
+  // The OperatorSets this model relies on.
+  repeated OperatorSetIdProto opset_import = 8;
+
+  // The name of the framework or tool used to generate this model.
+  string producer_name = 2;
+
+  // The version of the framework or tool used to generate this model.
+  string producer_version = 3;
+
+  // Domain name of the model.
+  string domain = 4;
+
+  // The version of the graph encoded.
+  int64 model_version = 5;
+
+  // A human-readable documentation for this model.
+  string doc_string = 6;
+
+  // The parameterized graph that is evaluated to execute the model.
+  GraphProto graph = 7;
+
+  // Named metadata values.
+  repeated StringStringEntryProto metadata_props = 14;
+
+  // Training-specific information.
+  repeated TrainingInfoProto training_info = 20;
+
+  // A list of function protos local to the model.
+  repeated FunctionProto functions = 25;
+}
+
+// StringStringEntryProto follows the pattern for cross-proto-version maps.
+message StringStringEntryProto {
+  string key = 1;
+  string value = 2;
+}
+
+// TensorAnnotation is used to add additional annotation on a specific tensor
+message TensorAnnotation {
+  string tensor_name = 1;
+  repeated StringStringEntryProto quant_parameter_tensor_names = 2;
+}
+
+// Graphs
+//
+// A graph defines the computational logic of a model.
+message GraphProto {
+  // The nodes in the graph, sorted topologically.
+  repeated NodeProto node = 1;
+
+  // The name of the graph.
+  string name = 2;               // namespace Graph
+
+  // A list of named tensor values, used to specify constant inputs of the graph.
+  repeated TensorProto initializer = 5;
+
+  // Initializers (ONNX >= 1.5) for sparse tensors
+  repeated SparseTensorProto sparse_initializer = 15;
+
+  // A human-readable documentation for this graph.
+  string doc_string = 10;
+
+  // The inputs and outputs of the graph.
+  repeated ValueInfoProto input = 11;
+  repeated ValueInfoProto output = 12;
+
+  // Information for the values in the graph.
+  repeated ValueInfoProto value_info = 13;
+
+  // This field carries information to indicate the mapping among a tensor and
+  // its quantization parameter tensors.
+  repeated TensorAnnotation quantization_annotation = 14;
+}
+
+// Tensors
+//
+// A serialized tensor value.
+message TensorProto {
+  // The shape of the tensor.
+  repeated int64 dims = 1;
+
+  // The data type of the tensor.
+  int32 data_type = 2;
+
+  // For very large tensors, we may want to store them in chunks.
+  message Segment {
+    int64 begin = 1;
+    int64 end = 2;
+  }
+  Segment segment = 3;
+
+  // Tensor content must be organized in row-major order.
+  //
+  // Depending on the data_type field, exactly one of the following fields
+  // will be used:
+  repeated float float_data = 4 [packed = true];
+  repeated int32 int32_data = 5 [packed = true];
+  repeated bytes string_data = 6;
+  repeated int64 int64_data = 7 [packed = true];
+
+  // Optionally, a name for the tensor.
+  string name = 8;               // namespace Value
+
+  // A human-readable documentation for this tensor.
+  string doc_string = 12;
+
+  // Serializations can either use one of the fields above, or use this
+  // raw bytes field. The only exception is the string case, where one is
+  // required to store the content in the repeated bytes string_data field.
+  bytes raw_data = 9;
+
+  // Data can be stored inside the protobuf file using type-specific fields or
+  // raw_data.
+  // Alternatively, raw bytes data can be stored in an external file, using the external_data field.
+  repeated StringStringEntryProto external_data = 13;
+
+  // Location of the data for this tensor.
+  enum DataLocation {
+    DEFAULT = 0;
+    EXTERNAL = 1;
+  }
+  DataLocation data_location = 14;
+
+  // For double
+  repeated double double_data = 10 [packed = true];
+
+  // For uint64 and uint32 values
+  repeated uint64 uint64_data = 11 [packed = true];
+
+  // Data type enumeration
+  enum DataType {
+    UNDEFINED = 0;
+    FLOAT = 1;      // float
+    UINT8 = 2;      // uint8_t
+    INT8 = 3;       // int8_t
+    UINT16 = 4;     // uint16_t
+    INT16 = 5;      // int16_t
+    INT32 = 6;      // int32_t
+    INT64 = 7;      // int64_t
+    STRING = 8;     // string
+    BOOL = 9;       // bool
+    FLOAT16 = 10;   // IEEE754 half-precision floating-point
+    DOUBLE = 11;    // double
+    UINT32 = 12;    // uint32_t
+    UINT64 = 13;    // uint64_t
+    COMPLEX64 = 14; // complex with float32 real and imaginary
+    COMPLEX128 = 15;// complex with float64 real and imaginary
+    BFLOAT16 = 16;  // bfloat16 (Brain Floating Point)
+    FLOAT8E4M3FN = 17;
+    FLOAT8E4M3FNUZ = 18;
+    FLOAT8E5M2 = 19;
+    FLOAT8E5M2FNUZ = 20;
+  }
+}
+
+// A serialized sparse-tensor value
+message SparseTensorProto {
+  // The shape of the underlying dense tensor.
+  repeated int64 dims = 1;
+
+  // The indices of the non-default values.
+  TensorProto indices = 2;
+
+  // The values of the non-default values.
+  TensorProto values = 3;
+}
+
+// Defines a tensor shape.
+message TensorShapeProto {
+  message Dimension {
+    oneof value {
+      int64 dim_value = 1;
+      string dim_param = 2;
+    };
+    // Standard denotation can optionally be used to denote
+    // tensor dimensions with standard semantic descriptions
+    string denotation = 3;
+  };
+  repeated Dimension dim = 1;
+}
+
+// Types
+//
+// The standard ONNX data types.
+message TypeProto {
+  message Tensor {
+    // This field MUST NOT have the value of UNDEFINED
+    int32 elem_type = 1;
+    TensorShapeProto shape = 2;
+  }
+
+  message Sequence {
+    // The type and optional shape of each element of the sequence.
+    TypeProto elem_type = 1;
+  }
+
+  message Map {
+    // This field MUST have a valid TensorProto.DataType value
+    int32 key_type = 1;
+    // This field MUST be present for this version of the IR.
+    TypeProto value_type = 2;
+  }
+
+  message Optional {
+    // The type and optional shape of the element wrapped.
+    TypeProto elem_type = 1;
+  }
+
+  message SparseTensor {
+    // This field MUST NOT have the value of UNDEFINED
+    int32 elem_type = 1;
+    TensorShapeProto shape = 2;
+  }
+
+  oneof value {
+    // The type of a tensor.
+    Tensor tensor_type = 1;
+
+    // The type of a sequence.
+    Sequence sequence_type = 4;
+
+    // The type of a map.
+    Map map_type = 5;
+
+    // The type of an optional.
+    Optional optional_type = 9;
+
+    // The type of a sparse tensor.
+    SparseTensor sparse_tensor_type = 8;
+  }
+
+  // An optional denotation can be used to denote the whole type
+  string denotation = 6;
+}
+
+// Operator Sets
+//
+// OperatorSets are uniquely identified by a (domain, opset_version) pair.
+message OperatorSetIdProto {
+  // The domain of the operator set being identified.
+  string domain = 1;
+
+  // The version of the operator set being identified.
+  int64 version = 2;
+}
+
+// FunctionProto represents a function definition
+message FunctionProto {
+  // The name of the function, similar usage of op_type in OperatorProto.
+  string name = 1;
+
+  // The inputs and outputs of the function.
+  repeated string input = 4;
+  repeated string output = 5;
+
+  // The attribute parameters of the function.
+  repeated string attribute = 6;
+
+  // The attribute protos for default values.
+  repeated AttributeProto attribute_proto = 11;
+
+  // The nodes in the function.
+  repeated NodeProto node = 7;
+
+  // A human-readable documentation for this function.
+  string doc_string = 8;
+
+  // The OperatorSets this function body relies on.
+  repeated OperatorSetIdProto opset_import = 9;
+
+  // The domain of the function.
+  string domain = 10;
+}

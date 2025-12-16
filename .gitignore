@@ -1,0 +1,66 @@
+# Rust .gitignore
+
+# Build artifacts
+/target/
+*.pdb
+
+# Cargo files
+Cargo.lock  # Keep for applications, uncomment to ignore for libraries
+**/*.rs.bk
+*.orig
+
+# Python bindings
+/dist/
+/wheels/
+*.whl
+*.egg-info/
+*.pyc
+__pycache__/
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg
+MANIFEST
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.code-workspace
+
+# Testing
+.coverage
+.tox/
+.pytest_cache/
+htmlcov/
+
+# Profiling
+perf.data
+perf.data.old
+flamegraph.svg
+
+# Documentation
+/target/doc/
+
+# OS
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
+
+# ONNX test models (if any large binary files)
+*.onnx
+!tests/**/*.onnx  # Keep test models if in tests directory

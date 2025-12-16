@@ -1,0 +1,143 @@
+[package]
+name = "furiosa-optimizer"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["Jung Wook Yang <sadpig70@gmail.com>"]
+description = "ONNX model optimizer for Furiosa NPU - Rust implementation"
+license = "Apache-2.0"
+repository = "https://github.com/prtx/furiosa-optimizer-rs"
+keywords = ["onnx", "optimizer", "neural-network", "npu", "furiosa"]
+categories = ["science", "mathematics", "algorithms"]
+
+[lib]
+name = "furiosa_optimizer"
+path = "src/lib.rs"
+crate-type = ["lib", "cdylib"]
+
+# ============================================================================
+# Dependencies
+# ============================================================================
+
+[dependencies]
+# Protobuf runtime
+prost = "0.12"
+
+# Ordered map (preserves insertion order like Python's OrderedDict)
+indexmap = { version = "2.2", features = ["serde"] }
+
+# N-dimensional array (numpy equivalent)
+ndarray = { version = "0.15", features = ["serde"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Stack-optimized small vectors
+smallvec = { version = "1.13", features = ["union", "serde"] }
+
+# Fast hashing (FxHashMap - 2-3x faster than std HashMap)
+rustc-hash = "1.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# Logging/Tracing
+log = "0.4"
+tracing = "0.1"
+
+# Optional: parallel processing
+rayon = { version = "1.10", optional = true }
+
+# Python bindings
+pyo3 = { version = "0.22", features = ["extension-module"], optional = true }
+
+# ============================================================================
+# Build Dependencies
+# ============================================================================
+
+[build-dependencies]
+prost-build = "0.12"
+
+# ============================================================================
+# Dev Dependencies
+# ============================================================================
+
+[dev-dependencies]
+# Testing utilities
+pretty_assertions = "1.4"
+test-case = "3.3"
+
+# Benchmarking
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# Temp file handling for tests
+tempfile = "3.10"
+
+# JSON for benchmark results
+serde_json = "1.0"
+
+# Timestamp for results
+chrono = { version = "0.4", features = ["serde"] }
+
+# ============================================================================
+# Features
+# ============================================================================
+
+[features]
+default = []
+parallel = ["rayon"]
+python = ["pyo3"]
+
+# ============================================================================
+# Profile Settings
+# ============================================================================
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.bench]
+lto = "thin"
+
+# ============================================================================
+# Benchmark Configuration
+# ============================================================================
+
+[[bench]]
+name = "transform_bench"
+harness = false
+
+[[example]]
+name = "optimize_model"
+path = "examples/optimize_model.rs"
+
+[[example]]
+name = "benchmark"
+path = "examples/benchmark.rs"
+
+[[example]]
+name = "analyze"
+path = "examples/analyze.rs"
+
+[[example]]
+name = "pattern_analysis"
+path = "examples/pattern_analysis.rs"
+
+[[example]]
+name = "cf_analysis"
+path = "examples/cf_analysis.rs"
+
+[[example]]
+name = "ln_analysis"
+path = "examples/ln_analysis.rs"
+
+[[example]]
+name = "test_ln_fusion"
+path = "examples/test_ln_fusion.rs"
+
+[[example]]
+name = "test_opset_upgrade"
+path = "examples/test_opset_upgrade.rs"
