@@ -1,4 +1,5 @@
 # Furiosa Optimizer (Rust)
+![infographic](https://github.com/user-attachments/assets/f2ddd358-4da4-4e6b-9a42-2a6955b59da5)
 
 ONNX model optimizer for Furiosa NPU - Rust implementation.
 
